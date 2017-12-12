@@ -1,0 +1,38 @@
+{
+  "name": "runtime-context",
+  "version": "0.0.1",
+  "repository": "https://github.com/shamcode/runtime-context",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest --coverage --no-cache",
+    "watch": "jest --watchAll"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-jest": "^21.2.0",
+    "babel-plugin-transform-class-properties": "^6.18.0",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-plugin-transform-es2015-modules-umd": "^6.24.1",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "jest": "^21.2.1"
+  },
+  "babel": {
+    "presets": [
+      "env"
+    ],
+    "plugins": [
+      "transform-decorators-legacy",
+      "transform-class-properties",
+      "transform-es2015-modules-umd"
+    ]
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ]
+  }
+}
