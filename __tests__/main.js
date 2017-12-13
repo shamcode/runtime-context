@@ -51,20 +51,23 @@ it( 'bar.processFile()', () => {
     } );
 } );
 
-
+it( 'bar.process()', () => {
+    runInContext( Context, () => {
+        const processMock = jest.fn();
+        const bar = new Bar( processMock );
+        try {
+            bar.process();
+        } catch ( e ) {
+            expect( e.message ).toBe( 'Foo.process is protected!' );
+        }
+        expect( processMock.mock.calls.length ).toBe( 0 );
+    } );
+} );
 
 //
 //runInContext( Context, () => {
 //    displayResult( '====Bar===' );
 //    const bar = new Bar;
-//    displayResult( 'Expected:  Foo.process called' );
-//    bar.processFile(); // Correct
-//    displayResult( 'Expected:  Foo.process is protected' );
-//    try {
-//        bar.process(); // Error
-//    } catch( e ) {
-//        displayResult( e.message );
-//    }
 //
 //    displayResult( '====Foo====' );
 //    const foo = new Foo;
