@@ -18,7 +18,7 @@ export const runtime = {
     pop() {
         return RUNTIME_CONTEXTS.pop();
     }
-}
+};
 
 export function runInContext( context, callback ) {
     const contexts = Array.isArray( context ) ? context : [ context ];
@@ -44,7 +44,7 @@ export function injectContext( target ) {
             const prototype = Object.getPrototypeOf( this );
             const reserved = [
                 'constructor'
-            ]
+            ];
             Object.getOwnPropertyNames( prototype ).forEach( propName => {
                 if ( -1 !== reserved.indexOf( propName ) ) {
                     return;
@@ -98,7 +98,7 @@ export function _protected( target, name, descriptor ) {
         } );
     }
     const meta = METADATA.get( target );
-    meta.protected.push( name )
+    meta.protected.push( name );
 
     const originalValue = descriptor.value;
     descriptor.value = function() {
@@ -106,7 +106,7 @@ export function _protected( target, name, descriptor ) {
             throw new Error( `${target.constructor.name}.${name} is protected!` );
         }
         return originalValue.call( this );
-    }
+    };
     return descriptor;
 }
 
@@ -118,7 +118,7 @@ export function _private( target, name, descriptor ) {
         } );
     }
     const meta = METADATA.get( target );
-    meta.private.push( name )
+    meta.private.push( name );
 
     const originalValue = descriptor.value;
     descriptor.value = function() {
@@ -126,7 +126,7 @@ export function _private( target, name, descriptor ) {
             throw new Error( `${target.constructor.name}.${name} is private!` );
         }
         return originalValue.call( this );
-    }
+    };
     return descriptor;
 }
 
