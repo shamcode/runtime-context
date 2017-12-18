@@ -8,3 +8,8 @@ Thumbs.db
 /test/assets
 /dist/
 /coverage/
+
+*.aux
+*.idx
+*.log
+*.synctex.gz
