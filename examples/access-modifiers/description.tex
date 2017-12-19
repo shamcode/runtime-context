@@ -65,7 +65,32 @@ $i: A \to B$ - класс $A$ наследуется от $B$
 \end{definition}
 
 \begin{definition}
-$[m_0, \dots, m_n]$ - стек вызова, состоящий из последовательного вызова методов $m_0$, $\dots$, $m_n$. 
+$[m_1, \dots, m_n]$ - стек вызова, состоящий из последовательного вызова методов $m_1$, $\dots$, $m_n$. 
 \end{definition}
+
+Очевидно, что если первый метод в стеке вызова принадлежит классу $C$, то этот публичный метод, т.е.:
+\begin{theorem}
+\label{first_method_must_be_public}
+Если $[m_1, \dots, m_n]$ и $m_1 \in F(C)$, то $a(m_1) = public$
+\end{theorem}
+
+Опишем с помощью этих определений модификаторы доступа $private$ и $protected$:
+
+\begin{definition}
+\label{private_def}
+Для стека вызова $[\dots, m_i, m_{i+1}, \dots]$ верно
+\begin{equation*}
+\left\{
+\begin{aligned}
+&m_{i+1} \in F(C) \\
+&a(m_{i+1}) = private
+\end{aligned}
+\right. 
+\implies m_i \in F(C)
+\end{equation*}
+\end{definition}
+
+Иными словами, если текущий метод в стеке вызова приватный и принадлежит классу $C$, то и предыдущий метод в стеке принадлежит классу $C$.
+
 
 \end{document}
