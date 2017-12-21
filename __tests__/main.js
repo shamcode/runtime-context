@@ -140,3 +140,61 @@ it ( 'bar.publicMethod2()', () => {
         expect( printMock.mock.calls.length ).toBe( 0 );
     } );
 } );
+
+it( 'publicChild() -> privateBase() must throw error', () => {
+    @injectContext
+    class Base {
+        constructor( callback ) {
+            this.callback = callback;
+        }
+
+        @_private privateBase() {
+            this.callback();
+        }
+    }
+
+    class Child extends Base {
+        publicChild() {
+            this.privateBase();
+        }
+    }
+
+    const callback = jest.fn();
+    const child = new Child( callback );
+    try {
+        child.publicChild();
+    } catch ( e ) {
+        expect( e.message ).toBe( 'Base.privateBase is private!' );
+    }
+    expect( callback.mock.calls.length ).toBe( 0 );
+} );
+
+it( 'publicChildChild() -> protectedBase() -> privateBase()', () => {
+    @injectContext
+    class Base {
+        constructor( callback ) {
+            this.callback = callback;
+        }
+
+        @_private privateBase() {
+            this.callback();
+        }
+
+        @_protected protectedBase() {
+            this.privateBase();
+        }
+    }
+
+    class Child extends Base {}
+
+    class ChildChild extends Child {
+        publicChildChild() {
+            this.protectedBase();
+        }
+    }
+
+    const callback = jest.fn();
+    const child = new ChildChild( callback );
+    child.publicChildChild();
+    expect( callback.mock.calls.length ).toBe( 1 );
+} );
