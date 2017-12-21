@@ -91,7 +91,10 @@ export function _protected( target, name, descriptor ) {
         if ( !runtime.hasInstanceOf( target.constructor ) ) {
             throw new Error( `${target.constructor.name}.${name} is protected!` );
         }
-        return originalValue.call( this );
+        return runInContext(
+            [ target.constructor ],
+            () => originalValue.call( this )
+        );
     };
     return descriptor;
 }
