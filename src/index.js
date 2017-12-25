@@ -45,7 +45,8 @@ export function injectContext( target ) {
 
             let context;
             let prototype = Object.getPrototypeOf( this );
-            while ( prototype !== Object.getPrototypeOf( {} ) ) {
+            const endPrototype = Object.getPrototypeOf( {} );
+            while ( prototype !== endPrototype ) {
                 context = prototype.constructor;
                 const contexts = [ this, prototype.constructor ];
                 const meta = METADATA.get( prototype );

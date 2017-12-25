@@ -68,7 +68,7 @@ $i: A \to B$ - класс $A$ наследуется от $B$
 \end{definition}
 
 \begin{definition}
-$[m_1, \dots, m_n]$ - стек вызова, состоящий из последовательного вызова методов $m_1$, $\dots$, $m_n$ таких, что $m_i$ был вызван из $m_{i-1}$.
+$[m_1, \dots, m_n]$ - стек вызовов, состоящий из последовательного вызова методов $m_1$, $\dots$, $m_n$ таких, что $m_i$ был вызван из $m_{i-1}$.
 \end{definition}
 
 
@@ -85,26 +85,26 @@ m_1 \in F(C) \implies a(m_1) = public
 \label{private}
 \left\{
 \begin{aligned}
-&m_{i+1} \in F(C) \\
-&a(m_{i+1}) = private
+&m_{j+1} \in F(C) \\
+&a(m_{j+1}) = private
 \end{aligned}
 \right. 
-\implies m_i \in F(C)
+\implies m_j \in F(C)
 \end{equation}
 
 \begin{equation}
 \label{protected}
 \left\{
 	\begin{aligned}
-		&m_{i+1} \in F(i(C)) \\
-		&a(m_{i+1}) = protected
+		&m_{j+1} \in F(i(C)) \\
+		&a(m_{j+1}) = protected
 	\end{aligned}
 \right.
 \implies
 \left[
 	\begin{aligned}
-		&m_i \in F(C) \\
-		&m_i \in F(i(C))
+		&m_j \in F(C) \\
+		&m_j \in F(i(C))
 	\end{aligned}
 \right.
 \end{equation}
@@ -112,8 +112,41 @@ m_1 \in F(C) \implies a(m_1) = public
 \end{definition}
 
 \begin{definition}
-Стек вызова, для которого хотя бы одно из условий \ref{first_method_public}, \ref{private}, \ref{protected} не выполненно будем называть некорректным или стеком вызова с ошибками доступа.
+Стек вызовов, для которого хотя бы одно из условий \ref{first_method_public}, \ref{private}, \ref{protected} не выполненно будем называть некорректным или стеком вызова с ошибками доступа.
 \end{definition}
 
+\section{Свойства корректного стека вызовов}
+\label{sec:2}
+
+\begin{theorem}
+\label{not_private_before_private}
+Для корректного стека $[\dots, m_j, \dots]$ верно:
+\begin{equation}
+	\left\{	
+		\begin{aligned}
+			&m_j \in F(C)\\
+			&a(m_j) = private
+		\end{aligned}
+	\right.
+	\implies
+	\exists m_k: 
+	\left\{
+		\begin{aligned}
+			&k < j \\
+			&m_k \in F(C) \\
+			&a(m_k) \neq private
+		\end{aligned}
+	\right.
+\end{equation}
+\end{theorem}
+\begin{proof}
+По свойству \ref{private} определения корректного стека \ref{correct_stack}, получаем, что $m_{j-1} \in F(C)$. Если $a(m_{j-1}) \neq private$, то мы получаем искомый $m_k$, т.к $j - 1 < j$.
+
+Если же $a(m_{j-1}) = private$, то применяя свойства \ref{private}, получаем, что $m_{j-2}$ либо является искомым, либо $a(m_{j-2}) = private$.
+
+Последовательно применяя свойства \ref{private} мы либо найдем искомый метод, либо дойдем до $m_1 \in F(C)$. Но по свойству \ref{first_method_public} получаем $a(m_1) = public$. 
+Что и требовалось доказать. $\blacksquare$
+
+\end{proof}
 
 \end{document}
