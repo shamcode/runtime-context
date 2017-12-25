@@ -63,9 +63,10 @@ export function injectContext( target ) {
                     const descriptor = Object.getOwnPropertyDescriptor( prototype, propName );
                     Object.defineProperty( prototype, propName, {
                         value() {
+                            const args = arguments;
                             return runInContext(
                                 contexts,
-                                () => descriptor.value.call( this )
+                                () => descriptor.value.apply( this, args )
                             )
                         }
                     } )
@@ -91,9 +92,10 @@ export function _protected( target, name, descriptor ) {
         if ( !runtime.hasInstanceOf( target.constructor ) ) {
             throw new Error( `${target.constructor.name}.${name} is protected!` );
         }
+        const args = arguments;
         return runInContext(
             [ target.constructor ],
-            () => originalValue.call( this )
+            () => originalValue.apply( this, args )
         );
     };
     return descriptor;
@@ -114,7 +116,7 @@ export function _private( target, name, descriptor ) {
         if ( !runtime.has( target.constructor ) ) {
             throw new Error( `${target.constructor.name}.${name} is private!` );
         }
-        return originalValue.call( this );
+        return originalValue.apply( this, arguments );
     };
     return descriptor;
 }

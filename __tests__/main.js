@@ -148,21 +148,21 @@ it( 'publicChild() -> privateBase() must throw error', () => {
             this.callback = callback;
         }
 
-        @_private privateBase() {
-            this.callback();
+        @_private privateBase( foo ) {
+            this.callback( foo );
         }
     }
 
     class Child extends Base {
-        publicChild() {
-            this.privateBase();
+        publicChild( foo ) {
+            this.privateBase( foo );
         }
     }
 
     const callback = jest.fn();
     const child = new Child( callback );
     try {
-        child.publicChild();
+        child.publicChild( 42 );
     } catch ( e ) {
         expect( e.message ).toBe( 'Base.privateBase is private!' );
     }
@@ -176,25 +176,26 @@ it( 'publicChildChild() -> protectedBase() -> privateBase()', () => {
             this.callback = callback;
         }
 
-        @_private privateBase() {
-            this.callback();
+        @_private privateBase( foo ) {
+            this.callback( foo );
         }
 
-        @_protected protectedBase() {
-            this.privateBase();
+        @_protected protectedBase( foo ) {
+            this.privateBase( foo );
         }
     }
 
     class Child extends Base {}
 
     class ChildChild extends Child {
-        publicChildChild() {
-            this.protectedBase();
+        publicChildChild( foo ) {
+            this.protectedBase( foo );
         }
     }
 
     const callback = jest.fn();
     const child = new ChildChild( callback );
-    child.publicChildChild();
+    child.publicChildChild( 42 );
     expect( callback.mock.calls.length ).toBe( 1 );
+    expect( callback.mock.calls[ 0 ][ 0 ] ).toBe( 42 );
 } );
