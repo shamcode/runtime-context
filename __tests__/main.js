@@ -42,28 +42,157 @@ class Bar extends Foo {
     }
 }
 
-it( 'foo.process()', () => {
-    runInContext( Context, () => {
-        const processMock = jest.fn();
-        const foo = new Foo( processMock );
-        try {
-            foo.process();
-        } catch ( e ) {
-            expect( e.message ).toBe( 'Foo.process is protected!' );
+describe( 'Stack trace with one element, without inheritance', () => {
+    @injectContext
+    class Base {
+        constructor( callback ) {
+            this.callback = callback;
         }
-        expect( processMock.mock.calls.length ).toBe( 0 );
+
+        @_private privateBase( foo ) {
+            this.callback( foo );
+        }
+
+        @_protected protectedBase( foo ) {
+            this.callback( foo );
+        }
+
+        publicBase( foo ) {
+            this.callback( foo );
+        }
+    }
+
+    it( 'privateBase()', () => {
+        const callback = jest.fn();
+        const base = new Base( callback );
+        try {
+            base.privateBase( 42 );
+        } catch ( e ) {
+            expect( e.message ).toBe( 'Base.privateBase is private!' );
+        }
+        expect( callback.mock.calls.length ).toBe( 0 );
+    } );
+
+    it( 'protectedBase()', () => {
+        const callback = jest.fn();
+        const base = new Base( callback );
+        try {
+            base.protectedBase( 42 );
+        } catch ( e ) {
+            expect( e.message ).toBe( 'Base.protectedBase is protected!' );
+        }
+        expect( callback.mock.calls.length ).toBe( 0 );
+    } );
+
+    it( 'publicBase()', () => {
+        const callback = jest.fn();
+        const base = new Base( callback );
+        base.publicBase( 42 );
+        expect( callback.mock.calls.length ).toBe( 1 );
+        expect( callback.mock.calls[ 0 ] ).toEqual( [ 42 ] );
     } );
 } );
 
-it( 'foo.publicForProcess()', () => {
-    runInContext( Context, () => {
-        const processMock = jest.fn();
-        const foo = new Foo( processMock );
-        foo.publicForProcess();
-        expect( processMock.mock.calls.length ).toBe( 1 );
+describe( 'Stack trace with two element, without inheritance', () => {
+    @injectContext
+    class Base {
+        constructor( callback ) {
+            this.callback = callback;
+        }
+
+        @_private privateBase( foo ) {
+            this.callback( foo );
+        }
+
+        @_protected protectedBase( foo ) {
+            this.callback( foo );
+        }
+
+        publicBaseForPrivate( foo ) {
+            this.privateBase( foo );
+        }
+
+        publicBaseForProtected( foo ) {
+            this.protectedBase( foo );
+        }
+
+        publicBase( foo ) {
+            this.callback( foo );
+        }
+    }
+
+    it( 'publicBaseForPrivate() -> privateBase()', () => {
+        const callback = jest.fn();
+        const base = new Base( callback );
+        base.publicBaseForPrivate( 42 );
+        expect( callback.mock.calls.length ).toBe( 1 );
+        expect( callback.mock.calls[ 0 ] ).toEqual( [ 42 ] );
+    } );
+
+    it( 'publicBaseForProtected() -> protectedBase()', () => {
+        const callback = jest.fn();
+        const base = new Base( callback );
+        base.publicBaseForProtected( 42 );
+        expect( callback.mock.calls.length ).toBe( 1 );
+        expect( callback.mock.calls[ 0 ] ).toEqual( [ 42 ] );
+    } );
+
+    it( 'publicBase(); privateBase();', () => {
+        const callback = jest.fn();
+        const base = new Base( callback );
+        base.publicBase( 42 );
+        expect( callback.mock.calls.length ).toBe( 1 );
+        expect( callback.mock.calls[ 0 ] ).toEqual( [ 42 ] );
+        try {
+            base.privateBase( 42 );
+        } catch ( e ) {
+            expect( e.message ).toBe( 'Base.privateBase is private!' );
+        }
+        expect( callback.mock.calls.length ).toBe( 1 );
+    } );
+
+    it( 'publicBase(); protectedBase();', () => {
+        const callback = jest.fn();
+        const base = new Base( callback );
+        base.publicBase( 42 );
+        expect( callback.mock.calls.length ).toBe( 1 );
+        expect( callback.mock.calls[ 0 ] ).toEqual( [ 42 ] );
+        try {
+            base.protectedBase( 42 );
+        } catch ( e ) {
+            expect( e.message ).toBe( 'Base.protectedBase is protected!' );
+        }
+        expect( callback.mock.calls.length ).toBe( 1 );
+    } );
+
+    it( 'publicBaseForPrivate(); privateBase();', () => {
+        const callback = jest.fn();
+        const base = new Base( callback );
+        base.publicBaseForPrivate( 42 );
+        expect( callback.mock.calls.length ).toBe( 1 );
+        expect( callback.mock.calls[ 0 ] ).toEqual( [ 42 ] );
+        try {
+            base.privateBase( 42 );
+        } catch ( e ) {
+            expect( e.message ).toBe( 'Base.privateBase is private!' );
+        }
+        expect( callback.mock.calls.length ).toBe( 1 );
+    } );
+
+    it( 'publicBaseForProtected(); protectedBase();', () => {
+        const callback = jest.fn();
+        const base = new Base( callback );
+        base.publicBaseForProtected( 42 );
+        expect( callback.mock.calls.length ).toBe( 1 );
+        expect( callback.mock.calls[ 0 ] ).toEqual( [ 42 ] );
+        try {
+            base.protectedBase( 42 );
+        } catch ( e ) {
+            expect( e.message ).toBe( 'Base.protectedBase is protected!' );
+        }
+        expect( callback.mock.calls.length ).toBe( 1 );
     } );
 } );
-
 
 it( 'bar.process()', () => {
     runInContext( Context, () => {
@@ -93,16 +222,6 @@ it( 'bar.publicForProcess()', () => {
         const bar = new Bar( processMock );
         bar.publicForProcess();
         expect( processMock.mock.calls.length ).toBe( 1 );
-    } );
-} );
-
-
-it( 'foo.publicMethodForPrint()', () => {
-    runInContext( Context, () => {
-        const printMock = jest.fn();
-        const foo = new Foo( null, printMock );
-        foo.publicMethodForPrint();
-        expect( printMock.mock.calls.length ).toBe( 1 );
     } );
 } );
 
