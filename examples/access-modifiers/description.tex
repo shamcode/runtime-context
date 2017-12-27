@@ -149,4 +149,38 @@ m_1 \in F(C) \implies a(m_1) = public
 
 \end{proof}
 
+Аналогично доказывается:
+\begin{theorem}
+\label{method_before_protected}
+Для корректного стекка $[\dots, m_j, \dots]$ верно:
+\begin{equation}
+	\left\{	
+		\begin{aligned}
+			&m_j \in F(C)\\
+			&a(m_j) = protected
+		\end{aligned}
+	\right.
+	\implies
+	\exists m_k: 
+	\left\{
+    	\begin{aligned}
+			&k < j \\
+			&a(m_k) = public \\
+			&\left[
+        		\begin{aligned}
+					& m_k \in F(C) \\
+   					&\left\{
+   						\begin{aligned}
+	   						m_j &\in F(C_n) \\
+	   						C_n &= i(C_{n-1}) \\
+	   						&\vdots \\
+	   						C_1 &= i(C)
+   						\end{aligned}
+   					\right.
+				\end{aligned}
+			\right.
+		\end{aligned}
+	\right.
+\end{equation}
+\end{theorem}
 \end{document}
