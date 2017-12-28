@@ -194,6 +194,61 @@ describe( 'Stack trace with two element, without inheritance', () => {
     } );
 } );
 
+describe( 'Stack trace with two element, with inheritance', () => {
+    @injectContext
+    class Base {
+        constructor( callback ) {
+            this.callback = callback;
+        }
+
+        @_private privateBase( foo ) {
+            this.callback( foo );
+        }
+
+        @_protected protectedBase( foo ) {
+            this.callback( foo );
+        }
+
+        publicBaseForPrivate( foo ) {
+            this.privateBase( foo );
+        }
+
+        publicBaseForProtected( foo ) {
+            this.protectedBase( foo );
+        }
+
+        publicBase( foo ) {
+            this.callback( foo );
+        }
+    }
+
+    class Child extends Base {
+
+    }
+
+    it( 'child.privateBase()', () => {
+        const callback = jest.fn();
+        const base = new Child( callback );
+        try {
+            base.privateBase( 42 );
+        } catch ( e ) {
+            expect( e.message ).toBe( 'Base.privateBase is private!' );
+        }
+        expect( callback.mock.calls.length ).toBe( 0 );
+    } );
+
+    it( 'child.protectedBase()', () => {
+        const callback = jest.fn();
+        const base = new Child( callback );
+        try {
+            base.protectedBase( 42 );
+        } catch ( e ) {
+            expect( e.message ).toBe( 'Base.protectedBase is protected!' );
+        }
+        expect( callback.mock.calls.length ).toBe( 0 );
+    } );
+} );
+
 it( 'bar.process()', () => {
     runInContext( Context, () => {
         const processMock = jest.fn();
