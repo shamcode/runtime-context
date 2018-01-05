@@ -50,8 +50,7 @@
 \author{shamcode}
 \maketitle
 
-\abstract{Использование понятия "Контекста" упрощает описание модели модификаторов доступа, в частоности private, protected, а также friendly methods}
-
+\abstract{Использование понятия "Контекста" упрощает описание модели модификаторов доступа, в частоности private, protected.}
 \section{Модель модификаторов доступа}
 \label{sec:1}
 Введем несколько определений
@@ -218,4 +217,17 @@ m_1 \in F(C) \implies a(m_1) = public
 	\right.
 \end{equation}
 \end{theorem}
+
+\section{Оределение контекста вызова}
+\label{sec:2}
+\begin{definition}
+\label{context}
+Множество $\theta$ называется контекством вызова для стека вызовов $[\dots, m_j, \dots]$, если 
+\begin{equation}
+\forall m_j \in F(C_k): C_k \in \theta
+\end{equation}
+\end{definition}
+
+Перепишем определение \ref{correct_stack} с помощью контекста вызова:
+
 \end{document}
