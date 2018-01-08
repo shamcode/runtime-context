@@ -229,5 +229,50 @@ m_1 \in F(C) \implies a(m_1) = public
 \end{definition}
 
 Перепишем определение \ref{correct_stack} с помощью контекста вызова:
+\begin{definition}
+\label{correct_stack_with_context}
+Стек вызовов $[m_1, \dots, m_n]$ с конекстом выполнения $\theta$ называется корректным если для него выполняются условия:
+
+\begin{equation}
+\label{first_method_public_with_context}
+m_1 \in F(C) \implies C \in \theta
+\end{equation}
+
+\begin{equation}
+\label{private_with_context}
+\left\{
+\begin{aligned}
+&m_{j+1} \in F(C) \\
+&a(m_{j+1}) = private
+\end{aligned}
+\right. 
+\implies C \in \theta
+\end{equation}
+
+\begin{equation}
+\label{protected_with_context}
+\left\{
+	\begin{aligned}
+		&m_{j+1} \in F(i(C)) \\
+		&a(m_{j+1}) = protected
+	\end{aligned}
+\right.
+\implies
+\left[
+	\begin{aligned}
+		&C \in \theta \\
+		&i(C) \in \theta
+	\end{aligned}
+\right.
+\end{equation}
+
+\end{definition}
+
+Докажем следующую теорему:
+\begin{theorem}
+Если для стека вызов $[m_1, \dots, m_n]$ с конекстом выполнения $\theta$ верно
+
+то он является корректным стеком вызовов.
+\end{theorem}
 
 \end{document}
