@@ -1,4 +1,4 @@
-import { _private, _protected, injectContext, runInContext } from '../src/index';
+import { _private, _protected, injectContext, runInContext } from '../../src/index';
 
 describe( 'Stack trace with one element, without inheritance', () => {
     @injectContext
