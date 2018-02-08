@@ -1,7 +1,26 @@
 // Core
 const RUNTIME_CONTEXTS = [];
 
-const METADATA = new WeakMap();
+const __METADATA__STORE__ = new WeakMap();
+const METADATA = {
+    get( key ) {
+        if ( !METADATA.has( key ) ) {
+            METADATA.set( key, {
+                protected: [],
+                private: []
+            } );
+        }
+        return __METADATA__STORE__.get( key );
+    },
+
+    set( key, value ) {
+        return __METADATA__STORE__.set( key, value );
+    },
+
+    has( key ) {
+        return __METADATA__STORE__.has( key );
+    }
+};
 
 export const runtime = {
     hasInstanceOf( context ) {
@@ -35,29 +54,26 @@ export function runInContext( context, callback ) {
 }
 
 export function injectContext( target ) {
+    const reserved = [
+        'constructor'
+    ];
+
     return class extends target {
         constructor() {
             super( ...arguments );
 
-            const reserved = [
-                'constructor'
-            ];
-
-            let context;
             let prototype = Object.getPrototypeOf( this );
-            const endPrototype = Object.getPrototypeOf( {} );
-            while ( prototype !== endPrototype ) {
-                context = prototype.constructor;
+            while ( prototype !== Object.prototype ) {
                 const contexts = [ this, prototype.constructor ];
                 const meta = METADATA.get( prototype );
                 Object.getOwnPropertyNames( prototype ).forEach( propName => {
                     if ( -1 !== reserved.indexOf( propName ) ) {
                         return;
                     }
-                    if ( meta !== undefined && -1 !== meta.protected.indexOf( propName ) ) {
+                    if ( -1 !== meta.protected.indexOf( propName ) ) {
                         return;
                     }
-                    if ( meta !== undefined && -1 !== meta.private.indexOf( propName ) ) {
+                    if ( -1 !== meta.private.indexOf( propName ) ) {
                         return;
                     }
                     const descriptor = Object.getOwnPropertyDescriptor( prototype, propName );
@@ -78,14 +94,7 @@ export function injectContext( target ) {
 }
 
 export function _protected( target, name, descriptor ) {
-    if ( !METADATA.has( target ) ) {
-        METADATA.set( target, {
-            protected: [],
-            private: []
-        } );
-    }
-    const meta = METADATA.get( target );
-    meta.protected.push( name );
+    METADATA.get( target ).protected.push( name );
 
     const originalValue = descriptor.value;
     descriptor.value = function() {
@@ -102,14 +111,7 @@ export function _protected( target, name, descriptor ) {
 }
 
 export function _private( target, name, descriptor ) {
-    if ( !METADATA.has( target ) ) {
-        METADATA.set( target, {
-            protected: [],
-            private: []
-        } );
-    }
-    const meta = METADATA.get( target );
-    meta.private.push( name );
+    METADATA.get( target ).private.push( name );
 
     const originalValue = descriptor.value;
     descriptor.value = function() {
