@@ -53,42 +53,45 @@ export function runInContext( context, callback ) {
     return result;
 }
 
-export function injectContext( target ) {
+function modifyPrototypeChainForContext() {
     const reserved = [
         'constructor'
     ];
 
+    let prototype = Object.getPrototypeOf( this );
+    while ( prototype !== Object.prototype ) {
+        const contexts = [ this, prototype.constructor ];
+        const meta = METADATA.get( prototype );
+        Object.getOwnPropertyNames( prototype ).forEach( propName => {
+            if ( -1 !== reserved.indexOf( propName ) ) {
+                return;
+            }
+            if ( -1 !== meta.protected.indexOf( propName ) ) {
+                return;
+            }
+            if ( -1 !== meta.private.indexOf( propName ) ) {
+                return;
+            }
+            const descriptor = Object.getOwnPropertyDescriptor( prototype, propName );
+            Object.defineProperty( prototype, propName, {
+                value() {
+                    const args = arguments;
+                    return runInContext(
+                        contexts,
+                        () => descriptor.value.apply( this, args )
+                    )
+                }
+            } )
+        } );
+        prototype = Object.getPrototypeOf( prototype );
+    }
+}
+
+export function injectContext( target ) {
     return class extends target {
         constructor() {
             super( ...arguments );
-
-            let prototype = Object.getPrototypeOf( this );
-            while ( prototype !== Object.prototype ) {
-                const contexts = [ this, prototype.constructor ];
-                const meta = METADATA.get( prototype );
-                Object.getOwnPropertyNames( prototype ).forEach( propName => {
-                    if ( -1 !== reserved.indexOf( propName ) ) {
-                        return;
-                    }
-                    if ( -1 !== meta.protected.indexOf( propName ) ) {
-                        return;
-                    }
-                    if ( -1 !== meta.private.indexOf( propName ) ) {
-                        return;
-                    }
-                    const descriptor = Object.getOwnPropertyDescriptor( prototype, propName );
-                    Object.defineProperty( prototype, propName, {
-                        value() {
-                            const args = arguments;
-                            return runInContext(
-                                contexts,
-                                () => descriptor.value.apply( this, args )
-                            )
-                        }
-                    } )
-                } );
-                prototype = Object.getPrototypeOf( prototype );
-            }
+            modifyPrototypeChainForContext.call( this );
         }
     };
 }
